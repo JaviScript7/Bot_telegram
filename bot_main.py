@@ -39,7 +39,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 def main():
-    # Token de API del bot (reemplaza 'YOUR_API_TOKEN_HERE' con tu token real)
+    # Token de API del bot (reemplaza 'API_TOKEN' con tu token)
     token = '7232414239:AAFdUuSQ5i1B9eWnaWILkuMg_0imHM6BeRA'
 
     # Crear la aplicación y pasarle el token del bot
