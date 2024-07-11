@@ -1,8 +1,9 @@
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup,ReplyKeyboardMarkup, KeyboardButton,ReplyKeyboardRemove
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes, ConversationHandler,CallbackContext
+from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes, ConversationHandler,CallbackContext,Updater
 from formulario import start_form, name_handler, contacto_handler, tipo_equipo_handler, marca_handler, modelo_handler,problema_handler, accesorios_handler,observaciones_handler,cancel_handler
 from formulario import NAME_C,CONTACTO, TIPO_EQUIPO, MARCA, MODELO, PROBLEMA, ACCESORIOS, OBSERVACIONES
+from database import create_table
 
 # Configuración de logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -12,15 +13,17 @@ logger = logging.getLogger(__name__)
 # Definir el teclado personalizado con valores asociados
 
 
+
 # Definición de comandos
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text('¡Hola! Usa /opciones para ver las opciones.')
+    await update.message.reply_text('¡Hola! Usa /menu para ver las opciones.')
 
 # Función para manejar las opciones
-async def opciones(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    custom_keyboard = [['Reparación 🛠️'], ['Consulta 📲'],['Almacen 📦','💰','⚙']]
+async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    custom_keyboard = [['Reparación 🛠️'], ['Consulta 📲'],['Almacen 📦','💰','📊','⚙']]
     reply_markup = ReplyKeyboardMarkup(custom_keyboard, resize_keyboard=True)
     await update.message.reply_text('Por favor, elige una opción:', reply_markup=reply_markup)
+
 
 
 # Función para manejar los botones
@@ -45,11 +48,22 @@ async def button(update: Update, context: CallbackContext) -> None:
         await update.message.reply_text(text="¡Presionaste de configuracion!",reply_markup=ReplyKeyboardRemove())
         #return ConversationHandler.END
     
-    elif user_reply  == 'cancel':
+    #elif user_reply  == 'cancel':
+        #return await cancel_handler(update, context)
+
+#Boton especifico para cancelar registro de reparacion
+async def button_regcancel(update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    query.answer()
+    if query.data == 'cancel':
+        query.message.reply_text('Registro cancelado.')
         return await cancel_handler(update, context)
-    
+
 # Función principal para iniciar el bot
 def main():
+    # Crear la tabla en la base de datos
+    create_table()
+
     # Token de API del bot (reemplaza 'YOUR_API_TOKEN_HERE' con tu token real)
     token = '7232414239:AAFdUuSQ5i1B9eWnaWILkuMg_0imHM6BeRA'
 
@@ -58,7 +72,7 @@ def main():
 
     # Añadir manejadores de comandos
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("opciones", opciones))
+    app.add_handler(CommandHandler("menu", menu))
 
     # Configuración del ConversationHandler para manejar el formulario
     conv_handler = ConversationHandler(
@@ -73,11 +87,14 @@ def main():
             ACCESORIOS: [MessageHandler(filters.TEXT & ~filters.COMMAND, accesorios_handler)],
             OBSERVACIONES: [MessageHandler(filters.TEXT & ~filters.COMMAND, observaciones_handler )],
         },
-        fallbacks=[CallbackQueryHandler(button, pattern='^cancel$')],
+        fallbacks=[CallbackQueryHandler(button_regcancel, pattern='^cancel$')],
+        #fallbacks=[MessageHandler(filters.Regex('^cancel$'), button)]
     )
 
     app.add_handler(conv_handler)
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, button))
+
+  
 
     # Iniciar el bot
     app.run_polling()

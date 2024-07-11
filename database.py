@@ -22,7 +22,7 @@ def create_table():
             modelo VARCHAR(100) NOT NULL,
             problema VARCHAR(50) NOT NULL,
             accesorios TEXT NOT NULL,
-            observaciones TEXT
+            observaciones TEXT,
             fecha_registro DATE NOT NULL,   
         )
         ''')
@@ -50,7 +50,7 @@ def save_equipment(data):
 
         cursor.execute('''
         INSERT INTO equipos (folio, name_contacto, contacto, tipo_equipo, marca, modelo, problema, accesorios, observaciones, fecha_registro)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         ''', data)
 
         conn.commit()

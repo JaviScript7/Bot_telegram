@@ -2,6 +2,9 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler
 import asyncio
 import logging
+import random
+from datetime import datetime
+from database import save_equipment
 
 # Definición de estados del formulario
 #NAME, AGE, GENDER = range(3)
@@ -76,8 +79,16 @@ async def accesorios_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 async def observaciones_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data['observaciones'] = update.message.text
+    
+    # Generar un folio de 7 dígitos
+    folio = ''.join(random.choices('0123456789', k=7))
+    # Obtener la fecha actual en formato YYYY-MM-DD
+    fecha = datetime.today().strftime('%Y-%m-%d')
+
     await update.message.reply_text(
         f"Gracias por completar el registro!\n\n"
+        f"🏷️ Folio: {folio}\n"
+        f"📅 Fecha de registro: {fecha}\n"
         f"👤 Nombre del cliente: {context.user_data['name_c']}\n"
         f"📞 Contacto: {context.user_data['contacto']}\n"
         f"📱 Tipo de equipo: {context.user_data['tipo_equipo']}\n"
@@ -88,11 +99,27 @@ async def observaciones_handler(update: Update, context: ContextTypes.DEFAULT_TY
         f"🔍 Observaciones: {context.user_data['observaciones']}\n"
 
     )
+    
+
+    
+    # Guardar los datos en la base de datos
+    save_equipment((
+        folio,
+        context.user_data['name_c'],
+        context.user_data['contacto'],
+        context.user_data['tipo_equipo'],
+        context.user_data['marca'],
+        context.user_data['modelo'],
+        context.user_data['problema'],
+        context.user_data['accesorios'],  
+        context.user_data['observaciones'],
+        fecha
+    ))
     return ConversationHandler.END
 
 
 async def cancel_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    await update.callback_query.message.reply_text(f'Formulario cancelado.')
+    await update.callback_query.message.reply_text(f'⚠️ Registro cancelado ⚠️')
     return ConversationHandler.END
 
 
