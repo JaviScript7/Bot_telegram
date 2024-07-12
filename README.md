@@ -1,4 +1,4 @@
-# 📱 Mobile Repair Bot
+# 🤖 Bot para Reparación de Celulares 📱
 
 ## Descripción
 
