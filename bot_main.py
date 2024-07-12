@@ -5,6 +5,8 @@ from formulario import start_form, name_handler, contacto_handler, tipo_equipo_h
 from formulario import NAME_C,CONTACTO, TIPO_EQUIPO, MARCA, MODELO, PROBLEMA, ACCESORIOS, OBSERVACIONES
 from database import create_table
 
+from consulta_reparacion import start_consult,folio_handler
+from consulta_reparacion import FOLIO
 # Configuración de logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -36,8 +38,9 @@ async def button(update: Update, context: CallbackContext) -> None:
         await start_form(update, context)
         return NAME_C
     elif user_reply  == 'Consulta 📲':
-        await update.message.reply_text(text="¡Presionaste el Botón 2!",reply_markup=ReplyKeyboardRemove())
-        return ConversationHandler.END
+        await start_consult(update, context)
+        return FOLIO
+        #return ConversationHandler.END
     elif user_reply  == 'Almacen 📦':
         await update.message.reply_text(text="¡Presionaste para almacen!",reply_markup=ReplyKeyboardRemove())
         #return ConversationHandler.END
@@ -51,6 +54,9 @@ async def button(update: Update, context: CallbackContext) -> None:
     #elif user_reply  == 'cancel':
         #return await cancel_handler(update, context)
 
+
+
+        
 #Boton especifico para cancelar registro de reparacion
 async def button_regcancel(update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
@@ -74,6 +80,17 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("menu", menu))
 
+    # Configuración del ConversationHandler para manejar la consulta de folio
+    convFolio_handler = ConversationHandler(
+        entry_points=[MessageHandler(filters.Regex('^Consulta 📲$'), button)],
+        states={
+            FOLIO: [MessageHandler(filters.TEXT & ~filters.COMMAND, folio_handler)]
+        },
+        fallbacks=[CallbackQueryHandler(button_regcancel, pattern='^cancel$')],
+        #fallbacks=[MessageHandler(filters.Regex('^cancel$'), button)]
+    )
+    app.add_handler(convFolio_handler)
+
     # Configuración del ConversationHandler para manejar el formulario
     conv_handler = ConversationHandler(
         entry_points=[MessageHandler(filters.Regex('^Reparación 🛠️$'), button)],
@@ -93,7 +110,7 @@ def main():
 
     app.add_handler(conv_handler)
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, button))
-
+    
   
 
     # Iniciar el bot

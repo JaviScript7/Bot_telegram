@@ -119,7 +119,7 @@ async def observaciones_handler(update: Update, context: ContextTypes.DEFAULT_TY
 
 
 async def cancel_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    await update.callback_query.message.reply_text(f'⚠️ Registro cancelado ⚠️')
+    await update.callback_query.message.reply_text(f'⚠️ Proceso cancelado ⚠️')
     return ConversationHandler.END
 
 

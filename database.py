@@ -1,5 +1,6 @@
 import mysql.connector
 from mysql.connector import errorcode
+from mysql.connector import Error
 
 def create_table():
     try:
@@ -58,3 +59,26 @@ def save_equipment(data):
         print(err)
     else:
         conn.close()
+
+# Consultar los datos del equipo por folio
+def get_equipo_by_folio(folio):
+    conn = mysql.connector.connect(
+        user='root',
+        password='P455W0RD',
+        host='localhost',
+        database='reparaciones'
+        )
+    if conn:
+        try:
+            cursor = conn.cursor()
+            query = "SELECT * FROM equipos WHERE folio = %s"
+            cursor.execute(query, (folio,))
+            result = cursor.fetchone()
+            return result
+        
+        except Error as e:
+            print(f"Error al consultar los datos del equipo: {e}")
+            return None
+        finally:
+            cursor.close()
+            conn.close()
