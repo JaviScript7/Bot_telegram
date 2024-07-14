@@ -70,8 +70,8 @@ def main():
     # Crear la tabla en la base de datos
     create_table()
 
-    # Token de API del bot (reemplaza 'YOUR_API_TOKEN_HERE' con tu token real)
-    token = '7232414239:AAFdUuSQ5i1B9eWnaWILkuMg_0imHM6BeRA'
+    # Token de API del bot (reemplaza 'API_TOKEN' con tu token real)
+    token = 'API_TOKEN'
 
     # Crear la aplicación y pasarle el token del bot
     app = ApplicationBuilder().token(token).build()
