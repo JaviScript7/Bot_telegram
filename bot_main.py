@@ -7,6 +7,10 @@ from database import create_table
 
 from consulta_reparacion import start_consult,folio_handler
 from consulta_reparacion import FOLIO
+
+import os
+from dotenv import load_dotenv #Esta linea puedes ignorarlo, lo ocupe para que durante el desarrollo no exponga mi key
+
 # Configuración de logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -70,8 +74,13 @@ def main():
     # Crear la tabla en la base de datos
     create_table()
 
+    #Estas lineas las podemos ignorar, esto lo ocupe para proteger mi token duranta el desarrollo y subir repositorios
+    load_dotenv()
+    API_TOKEN = os.getenv("API_TOKEN")
+    
+    
     # Token de API del bot (reemplaza 'API_TOKEN' con tu token real)
-    token = 'API_TOKEN'
+    token = API_TOKEN
 
     # Crear la aplicación y pasarle el token del bot
     app = ApplicationBuilder().token(token).build()
