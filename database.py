@@ -1,15 +1,11 @@
 import mysql.connector
 from mysql.connector import errorcode
 from mysql.connector import Error
+from connect import conector
 
 def create_table():
     try:
-        conn = mysql.connector.connect(
-            user='root',
-            password='P455W0RD',
-            host='localhost',
-            database='reparaciones'
-        )
+        conn = conector()
         cursor = conn.cursor()
 
         cursor.execute('''
@@ -24,7 +20,7 @@ def create_table():
             problema VARCHAR(50) NOT NULL,
             accesorios TEXT NOT NULL,
             observaciones TEXT,
-            fecha_registro DATE NOT NULL,   
+            fecha_registro DATE NOT NULL   
         )
         ''')
 
@@ -41,12 +37,7 @@ def create_table():
 
 def save_equipment(data):
     try:
-        conn = mysql.connector.connect(
-            user='root',
-            password='P455W0RD',
-            host='localhost',
-            database='reparaciones'
-        )
+        conn = conector()
         cursor = conn.cursor()
 
         cursor.execute('''
@@ -62,12 +53,7 @@ def save_equipment(data):
 
 # Consultar los datos del equipo por folio
 def get_equipo_by_folio(folio):
-    conn = mysql.connector.connect(
-        user='root',
-        password='P455W0RD',
-        host='localhost',
-        database='reparaciones'
-        )
+    conn = conector()
     if conn:
         try:
             cursor = conn.cursor()

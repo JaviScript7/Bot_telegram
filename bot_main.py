@@ -8,13 +8,52 @@ from database import create_table
 from consulta_reparacion import start_consult,folio_handler
 from consulta_reparacion import FOLIO
 
+import colorlog
+
+
+
 import os
 from dotenv import load_dotenv #Esta linea puedes ignorarlo, lo ocupe para que durante el desarrollo no exponga mi key
 
-# Configuración de logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
 
+
+
+#-----------------------------------------------------------
+# Configuración básica de colorlog con colores 
+handler = colorlog.StreamHandler()
+handler.setFormatter(colorlog.ColoredFormatter(
+    "%(log_color)s%(asctime)s | %(name)s | %(levelname)-8s | ➤ %(message)s",
+    datefmt='%Y-%m-%d %H:%M:%S',
+    log_colors={
+        'DEBUG': 'cyan',
+        'INFO': 'green',
+        'WARNING': 'yellow',
+        'ERROR': 'red',
+        'CRITICAL': 'bold_red',
+    }
+))
+
+logger = colorlog.getLogger()
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
+
+# Función para log con el símbolo ➤ antes del mensaje
+def log_message(level, message):
+    if level == 'debug':
+        logger.debug(message)
+    elif level == 'info':
+        logger.info(message)
+    elif level == 'warning':
+        logger.warning(message)
+    elif level == 'error':
+        logger.error(message)
+    elif level == 'critical':
+        logger.critical(message)
+
+
+
+
+#-----------------------------------------------------------
 
 # Definir el teclado personalizado con valores asociados
 
@@ -115,6 +154,7 @@ def main():
         },
         fallbacks=[CallbackQueryHandler(button_regcancel, pattern='^cancel$')],
         #fallbacks=[MessageHandler(filters.Regex('^cancel$'), button)]
+
     )
 
     app.add_handler(conv_handler)

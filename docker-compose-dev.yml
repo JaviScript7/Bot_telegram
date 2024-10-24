@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:  
+  db_container:
+    image: mysql
+    container_name: db_container_mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=P455W0RD
+      - MYSQL_DATABASE=reparaciones
+    networks:
+      - red_api_bot
+  
+  bot_python:
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5000:5000"
+    networks:
+      - red_api_bot
+    links:
+      - db_container
+    depends_on:
+      - db_container
+    volumes:
+      - .:/home/app
+    stdin_open: true
+    tty: true 
+
+#Si no tenemos creada nuestra red podemos usar estas lineas 
+networks:
+  red_api_bot:
+    driver: bridge    
