@@ -32,5 +32,5 @@ WORKDIR /home/app
 RUN pip install  --no-cache-dir -r /home/app/requirements.txt
 
 #Establemos lo que hara al iniciar el contenedor
-CMD [ "python","bot_main.py" ]
+CMD [ "python","src/bot_main.py" ]
 
