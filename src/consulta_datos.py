@@ -5,7 +5,7 @@ from database import get_data_for_time
 
 RANGO_FECHA = range(1)
 
-IMAGE_FILE_PATH = "grafica.jpg"
+
 
 async def start_consult_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     if update.message:
@@ -28,13 +28,15 @@ async def datos_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     #print(datos)
     if datos:
         await update.message.reply_text(
-            f"Hola sus datos estan siendo procesdos por {datos}"
+            f"Hola sus datos estan siendo procesdos por {datos[1]}"
         )
-        #await context.bot.send_photo(
-        #    chat_id=update.effective_chat.id,
-        #    photo=open(IMAGE_FILE_PATH, 'rb'),
-        #    caption=f"Datos por {fecha}.",
-        #)
+        IMAGE_FILE_PATH = f"analisis/{datos[0]}.png"
+
+        await context.bot.send_photo(
+            chat_id=update.effective_chat.id,
+            photo=open(IMAGE_FILE_PATH, 'rb'),
+            caption=f"Datos por {datos[1]}.",
+        )
     else:
         await update.message.reply_text(f'Los datos por {fecha} no fue encontrado en la base de datos.')
 

@@ -3,6 +3,7 @@ from mysql.connector import errorcode
 from mysql.connector import Error
 from connect import conector
 from datetime import datetime
+from analisis.analisis_datos import crear_grafico
 
 def create_table():
     try:
@@ -73,35 +74,73 @@ def get_equipo_by_folio(folio):
 
 
 def get_data_for_time(datos):
+    conn = conector()
     val_dato = datos.strip()  # Eliminar espacios en blanco al inicio y al final
+    
+    if conn:
+        try:
+            datetime.strptime(val_dato, '%Y-%m-%d') # Verificar si el dato corresponde a un día (YYYY-MM-DD)
+            cursor = conn.cursor()
+            query = "SELECT tipo_equipo, COUNT(*) as cantidad FROM equipos WHERE fecha_registro = %s GROUP BY tipo_equipo;"
+            cursor.execute(query, (val_dato,))
+            result = cursor.fetchall()
+            grafico = crear_grafico(result,dia="Dia")
+            cursor.close()
+            conn.close() 
+            return grafico
 
-    # Verificar si el dato corresponde a un día (YYYY-MM-DD)
-    try:
-        datetime.strptime(val_dato, '%Y-%m-%d')
-        return "Día"
-    except ValueError:
-        pass  
+        except Error as e:
+            print(f"Error al consultar los datos: {e}")
+            return None
+        except ValueError:
+            pass 
 
-    # Verificar si el dato corresponde a un mes (YYYY-MM)
-    try:
-        datetime.strptime(val_dato, '%Y-%m')
-        return "Mes"
-    except ValueError:
-        pass  
+            
 
-    # Verificar si el dato corresponde a un rango de semana (YYYY-MM-DD YYYY-MM-DD)
-    try:
-        start_date_str, end_date_str = val_dato.split()
-        # Intentar parsear ambas fechas
-        start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-        end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+        # --------------------------------
+        try:
+            datetime.strptime(val_dato, '%Y-%m') # Verificar si el dato corresponde a un mes (YYYY-MM)
+            cursor = conn.cursor()
+            query = "SELECT tipo_equipo, COUNT(*) as cantidad FROM equipos WHERE DATE_FORMAT(fecha_registro,'%Y-%m') = %s  GROUP BY tipo_equipo;"
+            cursor.execute(query, (val_dato,))
+            result = cursor.fetchall()
+            grafico = crear_grafico(result,dia="Mes")
+            cursor.close()
+            conn.close() 
+            return grafico
+        
+        except Error as e:
+            print(f"Error al consultar los datos: {e}")
+            return None
+        except ValueError:
+            pass 
+        finally:
+            pass
 
-        # Verificar que el rango sea válido (fecha de inicio debe ser menor que fecha de fin)
-        if start_date <= end_date:
-            return "Semana"
-    except ValueError:
-        pass  
-    except Exception as e:
-        print(f"Error inesperado: {e}")
+        #---------------------------------
+        try:
+            start_date_str, end_date_str = val_dato.split()
+            # Intentar parsear ambas fechas | Verificar si el dato corresponde a un rango de semana (YYYY-MM-DD YYYY-MM-DD)
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
 
-    return False  # Si no coincide con ninguno de los formatos
+            
+            if start_date <= end_date: # Verificar que el rango sea válido (fecha de inicio debe ser menor que fecha de fin)
+                    cursor = conn.cursor()
+                    query = "SELECT tipo_equipo, COUNT(*) as cantidad FROM equipos WHERE fecha_registro BETWEEN %s AND %s  GROUP BY tipo_equipo;"
+                    cursor.execute(query, (start_date,end_date))
+                    result = cursor.fetchall()
+                    grafico = crear_grafico(result,dia="Semana")
+                    cursor.close()
+                    conn.close() 
+                    return grafico
+        
+        except Error as e:
+            print(f"Error al consultar los datos: {e}")
+            return None
+        except ValueError:
+            pass 
+        finally:
+            pass
+
+        return False  # Si no coincide con ninguno de los formatos
