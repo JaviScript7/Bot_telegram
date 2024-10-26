@@ -26,19 +26,23 @@ git clone https://github.com/JaviScript7/Bot_telegram.git
 ```bash
 cd Bot_telegram
 ```
-### Paso 3: Ejecutar el contenedor Docker
+### Paso 3: Crear el archivo .env y colocar el token de tu bot sin " "
+```bash
+API_TOKEN= --- TU TOKEN ---
+```
+### Paso 4: Ejecutar el contenedor Docker
 ```bash
 docker-compose -f docker-compose.yml up -d --build 
 ```
-### Paso 4: Verificar que los contenedores esten corriendo
+### Paso 5: Verificar que los contenedores esten corriendo
 ```bash
 docker ps 
 ```
-### Paso 5: Verificar los logs 
+### Paso 6: Verificar los logs 
 ```bash
 docker logs <nombre del contenedor> 
 ```
-### Paso 6: Para detener 
+### Paso 7: Para detener 
 ```bash
 docker-compose -f docker-compose.yml down 
 ```
