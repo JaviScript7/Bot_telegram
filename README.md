@@ -47,5 +47,7 @@ docker logs <nombre del contenedor>
 docker-compose -f docker-compose.yml down 
 ```
 
+## Licencia ⚖️
+Este proyecto está bajo la [Licencia Apache 2.0](LICENSE)
 
 
